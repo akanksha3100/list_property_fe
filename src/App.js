@@ -5,11 +5,14 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Listings from "./pages/Listings";
 import CreateListing from "./pages/CreateListing";
+import Header from "./components/Header";
 
 function App() {
   return (
     <Router>
-      <Routes>
+      <Header />
+      <div style={{ paddingTop: '60px' }}>
+        <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
@@ -17,6 +20,7 @@ function App() {
         <Route path="/listings" element={<Listings />} />
         <Route path="/create-listing" element={<CreateListing />} />
       </Routes>
+      </div>
     </Router>
   );
 }
