@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import PropertyCard from "../components/PropertyCard";
+import useApi from "../hooks/useApi";
+import { GETPROPERTIES } from "../config/apiConfig";
 
 function Listings() {
   const navigate = useNavigate();
   const [listings, setListings] = useState([]);
   const [error, setError] = useState("");
+  const {api} = useApi();
 
   const handleAddListing = () => {
     navigate("/create-listing");
@@ -14,14 +16,9 @@ function Listings() {
 
   useEffect(() => {
     const fetchListings = async () => {
-      const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("http://localhost:5000/api/properties/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setListings(res.data.listings || []);
+        const res = await api({url: GETPROPERTIES})
+        setListings(res.listings || []);
       } catch (err) {
         console.error("Error fetching listings:", err);
         setError("Failed to fetch listings.");

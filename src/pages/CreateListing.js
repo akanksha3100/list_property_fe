@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import useApi from "../hooks/useApi";
+import { ADDPROPERTY, BULKUPLOAD } from "../config/apiConfig";
 
 function CreateListing() {
   const [form, setForm] = useState({
@@ -14,6 +15,7 @@ function CreateListing() {
   const [bulkError, setBulkError] = useState("");
   const [bulkSuccess, setBulkSuccess] = useState("");
   const navigate = useNavigate();
+  const { api, loading } = useApi();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,17 +39,12 @@ function CreateListing() {
       return;
     }
 
-    const token = localStorage.getItem("token");
     try {
-      await axios.post(
-        "http://localhost:5000/api/properties/add",
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      api({
+        url: ADDPROPERTY,
+        method: "POST",
+        data: form,
+      });
       alert("Listing created successfully");
       navigate("/listings");
     } catch (error) {
@@ -73,17 +70,17 @@ function CreateListing() {
     formData.append("file", file);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/properties/upload",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+      const res = await api({
+        url: BULKUPLOAD,
+        method: 'POST',
+        data: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         }
-      );
-      setBulkSuccess(res.data.message || "Bulk upload successful");
+      })
+      setBulkSuccess(res.message || "Bulk upload successful");
+      navigate("/listings");
       setBulkError("");
       setFile(null);
     } catch (error) {
@@ -124,11 +121,12 @@ function CreateListing() {
           value={form.area}
           onChange={handleChange}
           className={errors.area ? "input-error" : ""}
+          type="number"
         />
         {errors.area && <div className="error">{errors.area}</div>}
 
         <button type="submit" className="btn">
-          Create Listing
+          {loading ? "Creating..." : "Create Listing"}
         </button>
       </form>
 

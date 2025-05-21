@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
 import "./authForm.css";
 import { Link, useNavigate } from "react-router-dom";
+import useAPi from '../hooks/useApi';
+import { LOGIN } from "../config/apiConfig";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
+  const {api} = useAPi();
 
   const validate = () => {
     const errors = {};
@@ -42,8 +44,8 @@ function Login() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      localStorage.setItem("token", res.data.token);
+      const res = await api({url: LOGIN, method: 'POST', data: form})
+      localStorage.setItem("token", res.token);
       navigate("/listings");
       setErrors({});
       setServerError("");

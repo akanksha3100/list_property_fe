@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./authForm.css";
+import useAPi from '../hooks/useApi';
+import { REGISTER } from "../config/apiConfig";
 
 function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
+  const {api} = useAPi();
+  const navigate = useNavigate();
 
   const validate = () => {
     const errors = {};
@@ -48,7 +51,9 @@ function Register() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", form);
+      const res = await api({url: REGISTER, method: 'POST', data: form})
+      localStorage.setItem("token", res.token);
+      navigate("/listings");
       alert("Registered successfully");
     } catch (error) {
       console.error("Registration failed:", error);
